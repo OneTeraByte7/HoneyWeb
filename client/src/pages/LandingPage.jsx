@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import ProductSection from "./ProductSection";
 
 export default function LandingPage() {
   return (
@@ -65,6 +66,8 @@ export default function LandingPage() {
             BTech Honey is your platform for collaboration and growth. Share projects, find teammates, and get inspired by what others are building.
           </p>
         </section>
+
+        <ProductSection />
 
         {/* Contact Section */}
         <section id="contact" className="bg-black/60 px-8 py-12 text-white backdrop-blur-sm">
