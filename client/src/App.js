@@ -3,7 +3,7 @@ import LandingPage from "./pages/LandingPage";
 import CartPage from "./pages/CartPage";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import CartProvider from "./pages/CartContext";
+import CartProvider from "./pages/CartContext"; // ✅
 
 export default function App() {
   return (

@@ -35,10 +35,12 @@ const honeyProducts = [
     volume: "2L",
     description: "Harvested from diverse mountain flora. Thick texture, strong floral aroma.",
   },
+  // Add more if needed
 ];
 
 export default function ProductSection() {
-  const { addToCart } = useCart();
+
+  
   const [filters, setFilters] = useState({
     purity: "",
     time: "",
@@ -68,64 +70,49 @@ export default function ProductSection() {
         {/* Filter Sidebar */}
         <aside className="lg:w-1/4 w-full bg-black/50 p-6 rounded-lg border border-yellow-900 shadow-md">
           <h3 className="text-xl font-semibold mb-6 text-yellow-400">Filters</h3>
+
           <div className="space-y-4 text-sm font-medium">
             <div>
               <label>Purity</label>
-              <select
-                onChange={(e) => setFilters({ ...filters, purity: e.target.value })}
-                className="mt-1 w-full p-2 rounded bg-white/10"
-                value={filters.purity}
-              >
+              <select onChange={(e) => setFilters({ ...filters, purity: e.target.value })} className="mt-1 w-full p-2 rounded bg-white/10">
                 <option value="">All</option>
                 <option value="100%">100%</option>
                 <option value="95%">95%</option>
               </select>
             </div>
+
             <div>
               <label>Harvest Time</label>
-              <select
-                onChange={(e) => setFilters({ ...filters, time: e.target.value })}
-                className="mt-1 w-full p-2 rounded bg-white/10"
-                value={filters.time}
-              >
+              <select onChange={(e) => setFilters({ ...filters, time: e.target.value })} className="mt-1 w-full p-2 rounded bg-white/10">
                 <option value="">All</option>
                 <option value="Spring">Spring</option>
                 <option value="Winter">Winter</option>
                 <option value="Monsoon">Monsoon</option>
               </select>
             </div>
+
             <div>
               <label>Content</label>
-              <select
-                onChange={(e) => setFilters({ ...filters, content: e.target.value })}
-                className="mt-1 w-full p-2 rounded bg-white/10"
-                value={filters.content}
-              >
+              <select onChange={(e) => setFilters({ ...filters, content: e.target.value })} className="mt-1 w-full p-2 rounded bg-white/10">
                 <option value="">All</option>
                 <option value="Raw">Raw</option>
                 <option value="Infused">Infused</option>
                 <option value="Multi-flora">Multi-flora</option>
               </select>
             </div>
+
             <div>
               <label>Volume</label>
-              <select
-                onChange={(e) => setFilters({ ...filters, volume: e.target.value })}
-                className="mt-1 w-full p-2 rounded bg-white/10"
-                value={filters.volume}
-              >
+              <select onChange={(e) => setFilters({ ...filters, volume: e.target.value })} className="mt-1 w-full p-2 rounded bg-white/10">
                 <option value="">All</option>
                 <option value="1L">1L</option>
                 <option value="2L">2L</option>
               </select>
             </div>
+
             <div>
               <label>Sort By</label>
-              <select
-                onChange={(e) => setFilters({ ...filters, sort: e.target.value })}
-                className="mt-1 w-full p-2 rounded bg-white/10"
-                value={filters.sort}
-              >
+              <select onChange={(e) => setFilters({ ...filters, sort: e.target.value })} className="mt-1 w-full p-2 rounded bg-white/10">
                 <option value="">None</option>
                 <option value="low">Low to High</option>
                 <option value="high">High to Low</option>
@@ -137,10 +124,7 @@ export default function ProductSection() {
         {/* Product Grid */}
         <div className="lg:w-3/4 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
           {filteredProducts.map((product) => (
-            <div
-              key={product.id}
-              className="bg-white/10 border border-yellow-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition"
-            >
+            <div key={product.id} className="bg-white/10 border border-yellow-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition">
               <img src={product.img} alt={product.name} className="w-full h-60 object-cover" />
               <div className="p-4">
                 <h3 className="text-xl font-semibold text-yellow-300 mb-1">{product.name}</h3>
@@ -150,12 +134,7 @@ export default function ProductSection() {
                 <p className="text-sm">Content: {product.content}</p>
                 <p className="text-sm">Volume: {product.volume}</p>
                 <p className="mt-2 text-yellow-400 font-bold text-lg">₹{product.rate}</p>
-                <button
-                  onClick={() => addToCart(product)}
-                  className="mt-3 w-full bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 rounded transition"
-                >
-                  Add to Cart
-                </button>
+                <button className="mt-3 w-full bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 rounded transition">Add to Cart</button>
               </div>
             </div>
           ))}
