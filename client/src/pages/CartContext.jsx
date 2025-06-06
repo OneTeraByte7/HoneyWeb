@@ -1,12 +1,22 @@
 import React, { createContext, useContext, useState } from "react";
 
+// Create the context
 const CartContext = createContext();
 
-export const useCart = () => useContext(CartContext);
+// Custom hook to access cart context
+export const useCart = () => {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error("useCart must be used within a CartProvider");
+  }
+  return context;
+};
 
+// Provider component
 export default function CartProvider({ children }) {
   const [cart, setCart] = useState([]);
 
+  // Add to cart function
   const addToCart = (product) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.id === product.id);
@@ -22,10 +32,12 @@ export default function CartProvider({ children }) {
     });
   };
 
+  // Remove from cart function
   const removeFromCart = (productId) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.id === productId);
       if (!existing) return prev;
+
       if (existing.quantity === 1) {
         return prev.filter((item) => item.id !== productId);
       } else {
@@ -38,12 +50,12 @@ export default function CartProvider({ children }) {
     });
   };
 
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  // Calculate total items in cart
+  const totalItems = cart?.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
+  // Final provider return
   return (
-    <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, totalItems }}
-    >
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, totalItems }}>
       {children}
     </CartContext.Provider>
   );

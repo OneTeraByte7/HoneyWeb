@@ -125,7 +125,7 @@ export default function LandingPage() {
 
         {/* 8. Footer */}
         <footer className="text-yellow-100 py-6 text-center bg-black/70">
-          <p>© 2025 BTech Honey. Made with ❤️ for BTech students.</p>
+          <p>© 2025 BTech Wala. Made with Passion for All.</p>
           <div className="mt-2 space-x-4">
             <a href="#about" className="hover:underline">About</a>
             <a href="#contact" className="hover:underline">Contact</a>

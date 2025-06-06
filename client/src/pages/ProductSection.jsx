@@ -35,19 +35,28 @@ const honeyProducts = [
     volume: "2L",
     description: "Harvested from diverse mountain flora. Thick texture, strong floral aroma.",
   },
-  // Add more if needed
 ];
 
 export default function ProductSection() {
+  const { addToCart } = useCart();
 
-  
-  const [filters, setFilters] = useState({
+  const defaultFilters = {
     purity: "",
     time: "",
     content: "",
     volume: "",
     sort: "",
-  });
+  };
+
+  const [filters, setFilters] = useState(defaultFilters);
+  const [quantities, setQuantities] = useState({});
+
+  const clearFilters = () => {
+    setFilters(defaultFilters);
+  };
+
+  const inputClass =
+    "mt-1 w-full p-2 rounded bg-zinc-900 text-white border border-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500";
 
   const filteredProducts = honeyProducts
     .filter((item) =>
@@ -62,6 +71,21 @@ export default function ProductSection() {
       return 0;
     });
 
+  const handleQuantityChange = (id, delta) => {
+    setQuantities((prev) => ({
+      ...prev,
+      [id]: Math.max((prev[id] || 0) + delta, 0),
+    }));
+  };
+
+  const handleAddToCart = (product) => {
+    const quantity = quantities[product.id] || 0;
+    for (let i = 0; i < quantity; i++) {
+      addToCart(product);
+    }
+    setQuantities((prev) => ({ ...prev, [product.id]: 0 }));
+  };
+
   return (
     <section className="bg-black/80 text-white px-8 py-16">
       <h2 className="text-4xl font-bold text-center mb-12 text-yellow-500">Our Honey Products</h2>
@@ -74,7 +98,11 @@ export default function ProductSection() {
           <div className="space-y-4 text-sm font-medium">
             <div>
               <label>Purity</label>
-              <select onChange={(e) => setFilters({ ...filters, purity: e.target.value })} className="mt-1 w-full p-2 rounded bg-white/10">
+              <select
+                value={filters.purity}
+                onChange={(e) => setFilters({ ...filters, purity: e.target.value })}
+                className={inputClass}
+              >
                 <option value="">All</option>
                 <option value="100%">100%</option>
                 <option value="95%">95%</option>
@@ -83,7 +111,11 @@ export default function ProductSection() {
 
             <div>
               <label>Harvest Time</label>
-              <select onChange={(e) => setFilters({ ...filters, time: e.target.value })} className="mt-1 w-full p-2 rounded bg-white/10">
+              <select
+                value={filters.time}
+                onChange={(e) => setFilters({ ...filters, time: e.target.value })}
+                className={inputClass}
+              >
                 <option value="">All</option>
                 <option value="Spring">Spring</option>
                 <option value="Winter">Winter</option>
@@ -93,7 +125,11 @@ export default function ProductSection() {
 
             <div>
               <label>Content</label>
-              <select onChange={(e) => setFilters({ ...filters, content: e.target.value })} className="mt-1 w-full p-2 rounded bg-white/10">
+              <select
+                value={filters.content}
+                onChange={(e) => setFilters({ ...filters, content: e.target.value })}
+                className={inputClass}
+              >
                 <option value="">All</option>
                 <option value="Raw">Raw</option>
                 <option value="Infused">Infused</option>
@@ -103,7 +139,11 @@ export default function ProductSection() {
 
             <div>
               <label>Volume</label>
-              <select onChange={(e) => setFilters({ ...filters, volume: e.target.value })} className="mt-1 w-full p-2 rounded bg-white/10">
+              <select
+                value={filters.volume}
+                onChange={(e) => setFilters({ ...filters, volume: e.target.value })}
+                className={inputClass}
+              >
                 <option value="">All</option>
                 <option value="1L">1L</option>
                 <option value="2L">2L</option>
@@ -112,19 +152,33 @@ export default function ProductSection() {
 
             <div>
               <label>Sort By</label>
-              <select onChange={(e) => setFilters({ ...filters, sort: e.target.value })} className="mt-1 w-full p-2 rounded bg-white/10">
+              <select
+                value={filters.sort}
+                onChange={(e) => setFilters({ ...filters, sort: e.target.value })}
+                className={inputClass}
+              >
                 <option value="">None</option>
                 <option value="low">Low to High</option>
                 <option value="high">High to Low</option>
               </select>
             </div>
+
+            <button
+              onClick={clearFilters}
+              className="mt-4 w-full bg-red-700 hover:bg-red-800 text-white py-2 rounded transition"
+            >
+              Clear Filters
+            </button>
           </div>
         </aside>
 
         {/* Product Grid */}
         <div className="lg:w-3/4 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
           {filteredProducts.map((product) => (
-            <div key={product.id} className="bg-white/10 border border-yellow-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition">
+            <div
+              key={product.id}
+              className="bg-white/10 border border-yellow-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition"
+            >
               <img src={product.img} alt={product.name} className="w-full h-60 object-cover" />
               <div className="p-4">
                 <h3 className="text-xl font-semibold text-yellow-300 mb-1">{product.name}</h3>
@@ -134,7 +188,38 @@ export default function ProductSection() {
                 <p className="text-sm">Content: {product.content}</p>
                 <p className="text-sm">Volume: {product.volume}</p>
                 <p className="mt-2 text-yellow-400 font-bold text-lg">₹{product.rate}</p>
-                <button className="mt-3 w-full bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 rounded transition">Add to Cart</button>
+
+                {/* Quantity Selector */}
+                <div className="flex items-center justify-between mt-4 mb-2">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => handleQuantityChange(product.id, -1)}
+                      className="bg-yellow-700 hover:bg-yellow-800 px-3 py-1 rounded text-white"
+                    >
+                      -
+                    </button>
+                    <span className="text-lg">{quantities[product.id] || 0}</span>
+                    <button
+                      onClick={() => handleQuantityChange(product.id, 1)}
+                      className="bg-yellow-700 hover:bg-yellow-800 px-3 py-1 rounded text-white"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                {/* Add to Cart */}
+                <button
+                  onClick={() => handleAddToCart(product)}
+                  disabled={!quantities[product.id]}
+                  className={`w-full ${
+                    !quantities[product.id]
+                      ? "bg-gray-500 cursor-not-allowed"
+                      : "bg-yellow-600 hover:bg-yellow-700"
+                  } text-white font-medium py-2 rounded transition`}
+                >
+                  Add to Cart
+                </button>
               </div>
             </div>
           ))}
