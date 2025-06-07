@@ -1,29 +1,34 @@
-// src/pages/Login.jsx
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";  // import useNavigate
 import AuthFormWrapper from "../components/AuthFormWrapper";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();  // initialize navigate
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async e => {
-    e.preventDefault();
-    try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", form);
-      // Save token in localStorage
-      localStorage.setItem("token", res.data.token);
-      setMessage(`Welcome back, ${res.data.user.name}!`);
-      setForm({ email: "", password: "" });
-      // You can redirect user here after login if you want
-    } catch (err) {
-      setMessage(err.response?.data?.msg || "Login failed");
-    }
-  };
+  e.preventDefault();
+  try {
+    const res = await axios.post("http://localhost:5000/api/auth/login", form);
+    localStorage.setItem("authToken", res.data.token); // use consistent key
+    setMessage(`Welcome back, ${res.data.user.name}!`);
+    setForm({ email: "", password: "" });
+
+    setTimeout(() => {
+      navigate("/landing");  // redirect to /landing after login
+    }, 1000);
+
+  } catch (err) {
+    setMessage(err.response?.data?.msg || "Login failed");
+  }
+};
+
 
   return (
     <AuthFormWrapper title="Login">

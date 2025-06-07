@@ -1,17 +1,21 @@
 import { useCart } from "./CartContext";
 import { Link } from "react-router-dom";
+import Squares from "./Squares"; // import your Squares background component
 
 export default function CartPage() {
   const { cart, removeFromCart } = useCart();
 
   return (
-    <section className="min-h-screen px-8 py-20 bg-black text-white">
+    <section className="relative min-h-screen px-8 py-20 bg-black text-white overflow-hidden">
+      {/* Squares background - absolute, full size, behind content */}
+      <Squares className="absolute inset-0 -z-10" />
+
       <h2 className="text-3xl font-bold text-center mb-10 text-yellow-400">Your Cart</h2>
 
       {cart.length === 0 ? (
         <p className="text-center text-lg">
           🛒 Your cart is empty.{" "}
-          <Link to="/" className="text-yellow-500 underline">Go shopping</Link>.
+          <Link to="/Landing" className="text-yellow-500 underline">Go shopping</Link>.
         </p>
       ) : (
         <div className="max-w-4xl mx-auto space-y-6">

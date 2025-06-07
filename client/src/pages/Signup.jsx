@@ -1,11 +1,12 @@
-// src/pages/Signup.jsx
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";  // import useNavigate
 import AuthFormWrapper from "../components/AuthFormWrapper";
 
 export default function Signup() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [message, setMessage] = useState("");
+  const navigate = useNavigate(); // initialize navigate
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -17,6 +18,14 @@ export default function Signup() {
       const res = await axios.post("http://localhost:5000/api/auth/signup", form);
       setMessage(res.data.msg || "Registered successfully!");
       setForm({ name: "", email: "", password: "" });
+
+      // Redirect to login after 1 second delay (optional)
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
+      
+      // Or immediate redirect without delay:
+      // navigate("/login");
     } catch (err) {
       setMessage(err.response?.data?.msg || "Signup failed");
     }
