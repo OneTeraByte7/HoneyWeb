@@ -19,17 +19,14 @@ export default function CheckoutPage() {
     country: "",
   });
 
-  // Assuming authToken or userId is stored in localStorage
   const authToken = localStorage.getItem("authToken");
 
   useEffect(() => {
     if (!authToken) {
-      // If not logged in, redirect or do nothing
       setLoading(false);
       return;
     }
 
-    // Fetch user's saved address from backend
     const fetchAddress = async () => {
       try {
         const res = await axios.get("http://localhost:5000/api/user/address", {
@@ -37,7 +34,7 @@ export default function CheckoutPage() {
         });
         if (res.data && res.data.address) {
           setExistingAddress(res.data.address);
-          setFormData(res.data.address); // prefill form with existing address
+          setFormData(res.data.address);
         }
       } catch (error) {
         console.error("Error fetching user address:", error);
@@ -53,19 +50,13 @@ export default function CheckoutPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleUseExisting = () => {
-    setUseExisting(true);
-  };
-
-  const handleEnterNew = () => {
-    setUseExisting(false);
-  };
+  const handleUseExisting = () => setUseExisting(true);
+  const handleEnterNew = () => setUseExisting(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      // Save or update address for user in backend
       const res = await axios.post(
         "http://localhost:5000/api/checkout",
         formData,
@@ -73,7 +64,6 @@ export default function CheckoutPage() {
       );
 
       if (res.status === 200) {
-        // Redirect to Billing Page with user data
         navigate("/billing", { state: { userData: formData } });
       }
     } catch (error) {
@@ -82,122 +72,78 @@ export default function CheckoutPage() {
     }
   };
 
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
+  if (loading) return <p className="text-center mt-10 text-white">Loading...</p>;
 
   return (
-    <div className="max-w-xl mx-auto p-4 mt-10 bg-white shadow-lg rounded">
-      <h2 className="text-2xl font-bold mb-6">Checkout - Address Info</h2>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 px-4 py-12 text-white">
+      <div className="max-w-2xl mx-auto p-8 bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl rounded-2xl text-white">
+        <h2 className="text-3xl font-semibold mb-6 text-white">
+          Checkout - Address Info
+        </h2>
 
-      {existingAddress && !useExisting ? (
-        <div className="mb-6 border p-4 rounded bg-green-50">
-          <h3 className="text-lg font-semibold mb-2">Saved Address</h3>
-          <p>{existingAddress.fullName}</p>
-          <p>{existingAddress.addressLine1}</p>
-          {existingAddress.addressLine2 && <p>{existingAddress.addressLine2}</p>}
-          <p>
-            {existingAddress.city}, {existingAddress.state} - {existingAddress.postalCode}
-          </p>
-          <p>{existingAddress.country}</p>
-          <p>Phone: {existingAddress.phone}</p>
-          <p>Email: {existingAddress.email}</p>
+        {existingAddress && !useExisting ? (
+          <div className="mb-6 border border-white/20 p-4 rounded-lg bg-white/5 backdrop-blur-md">
+            <h3 className="text-lg font-semibold mb-2">Saved Address</h3>
+            <p>{existingAddress.fullName}</p>
+            <p>{existingAddress.addressLine1}</p>
+            {existingAddress.addressLine2 && <p>{existingAddress.addressLine2}</p>}
+            <p>
+              {existingAddress.city}, {existingAddress.state} -{" "}
+              {existingAddress.postalCode}
+            </p>
+            <p>{existingAddress.country}</p>
+            <p>Phone: {existingAddress.phone}</p>
+            <p>Email: {existingAddress.email}</p>
 
-          <button
-            onClick={handleUseExisting}
-            className="mt-4 bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition"
-          >
-            Use This Address
-          </button>
+            <div className="flex gap-4 mt-4">
+              <button
+                onClick={handleUseExisting}
+                className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded shadow transition"
+              >
+                Use This Address
+              </button>
+              <button
+                onClick={handleEnterNew}
+                className="border border-green-600 text-green-400 hover:bg-green-900/30 py-2 px-4 rounded shadow transition"
+              >
+                Enter New Address
+              </button>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="grid gap-4">
+            {[
+              { name: "fullName", placeholder: "Full Name" },
+              { name: "email", placeholder: "Email", type: "email" },
+              { name: "phone", placeholder: "Phone" },
+              { name: "addressLine1", placeholder: "Address Line 1" },
+              { name: "addressLine2", placeholder: "Address Line 2", optional: true },
+              { name: "city", placeholder: "City" },
+              { name: "state", placeholder: "State" },
+              { name: "postalCode", placeholder: "Postal Code" },
+              { name: "country", placeholder: "Country" },
+            ].map(({ name, placeholder, type = "text", optional }) => (
+              <input
+                key={name}
+                type={type}
+                name={name}
+                value={formData[name]}
+                onChange={handleChange}
+                placeholder={placeholder}
+                required={!optional}
+                className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 placeholder-white/60"
+              />
+            ))}
 
-          <button
-            onClick={handleEnterNew}
-            className="mt-4 ml-4 border border-green-600 text-green-600 py-2 px-4 rounded hover:bg-green-100 transition"
-          >
-            Enter New Address
-          </button>
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="grid gap-4">
-          <input
-            name="fullName"
-            onChange={handleChange}
-            value={formData.fullName}
-            placeholder="Full Name"
-            required
-            className="input"
-          />
-          <input
-            name="email"
-            onChange={handleChange}
-            value={formData.email}
-            placeholder="Email"
-            type="email"
-            required
-            className="input"
-          />
-          <input
-            name="phone"
-            onChange={handleChange}
-            value={formData.phone}
-            placeholder="Phone"
-            required
-            className="input"
-          />
-          <input
-            name="addressLine1"
-            onChange={handleChange}
-            value={formData.addressLine1}
-            placeholder="Address Line 1"
-            required
-            className="input"
-          />
-          <input
-            name="addressLine2"
-            onChange={handleChange}
-            value={formData.addressLine2}
-            placeholder="Address Line 2"
-            className="input"
-          />
-          <input
-            name="city"
-            onChange={handleChange}
-            value={formData.city}
-            placeholder="City"
-            required
-            className="input"
-          />
-          <input
-            name="state"
-            onChange={handleChange}
-            value={formData.state}
-            placeholder="State"
-            required
-            className="input"
-          />
-          <input
-            name="postalCode"
-            onChange={handleChange}
-            value={formData.postalCode}
-            placeholder="Postal Code"
-            required
-            className="input"
-          />
-          <input
-            name="country"
-            onChange={handleChange}
-            value={formData.country}
-            placeholder="Country"
-            required
-            className="input"
-          />
-
-          <button
-            type="submit"
-            className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition"
-          >
-            Continue to Billing
-          </button>
-        </form>
-      )}
+            <button
+              type="submit"
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition duration-300"
+            >
+              Continue to Billing
+            </button>
+          </form>
+        )}
+      </div>
     </div>
   );
 }
