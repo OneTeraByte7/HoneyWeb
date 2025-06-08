@@ -1,4 +1,3 @@
-// src/pages/LandingPage.jsx
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ProductSection from "./ProductSection";
@@ -7,17 +6,43 @@ export default function LandingPage() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
-  // On component mount, get user info from localStorage
+  // Fetch user profile on mount
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    const loadUser = async () => {
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        try {
+          const res = await fetch("/api/user/profile", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setUser(data);
+            localStorage.setItem("user", JSON.stringify(data));
+            return;
+          }
+          localStorage.removeItem("authToken");
+        } catch (err) {
+          console.error("Failed to fetch profile:", err);
+        }
+      }
+
+      // fallback to cached user
+      const cachedUser = localStorage.getItem("user");
+      if (cachedUser) {
+        try {
+          setUser(JSON.parse(cachedUser));
+        } catch {
+          setUser(null);
+        }
+      }
+    };
+
+    loadUser();
   }, []);
 
-  // Logout clears localStorage and redirects to login
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("authToken");
     localStorage.removeItem("user");
     setUser(null);
     navigate("/login");
@@ -36,7 +61,7 @@ export default function LandingPage() {
         Your browser does not support the video tag.
       </video>
 
-      {/* Optional Overlay */}
+      {/* Overlay */}
       <div className="fixed inset-0 bg-black/20 z-0" />
 
       {/* Navbar */}
@@ -50,67 +75,54 @@ export default function LandingPage() {
         </div>
 
         <div className="space-x-6 font-semibold flex items-center">
-          {user ? (
+          {user && (
             <>
-              <span className="mr-4">Hello, {user.name}</span>
+              <span className="mr-4">Hello, {user.name || "User"}</span>
               <button
                 onClick={handleLogout}
                 className="bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-white transition"
               >
                 Logout
               </button>
-              <Link
-                to="/cart"
-                className="hover:text-yellow-300 transition ml-6"
-              >
-                Cart 🛒
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="hover:text-yellow-300 transition">
-                Login
-              </Link>
-              <Link to="/signup" className="hover:text-yellow-300 transition">
-                Signup
-              </Link>
-              <Link to="/cart" className="hover:text-yellow-300 transition">
-                Cart 🛒
-              </Link>
             </>
           )}
+          <Link to="/cart" className="hover:text-yellow-300 transition ml-6">
+            Cart 🛒
+          </Link>
         </div>
       </nav>
 
-      {/* Page Content */}
+      {/* Main Content */}
       <div className="relative z-10 mt-24 flex flex-col space-y-20 text-white px-4">
-        {/* 1. Hero / Content */}
+        {/* Hero Section */}
         <section className="text-center py-20">
           <h2 className="text-5xl font-bold mb-4">Welcome to BTech Honey</h2>
           <p className="max-w-2xl mx-auto mb-8 text-lg">
             Your sweet spot for everything BTech-related. Join us to explore
             projects, connect with peers, and supercharge your academic journey.
           </p>
-          <div className="space-x-4">
-            <Link
-              to="/signup"
-              className="px-6 py-2 bg-yellow-700 text-white rounded-lg hover:bg-yellow-800 transition"
-            >
-              Get Started
-            </Link>
-            <Link
-              to="/login"
-              className="px-6 py-2 border border-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition"
-            >
-              Login
-            </Link>
-          </div>
+          {!user && (
+            <div className="space-x-4">
+              <Link
+                to="/signup"
+                className="px-6 py-2 bg-yellow-700 text-white rounded-lg hover:bg-yellow-800 transition"
+              >
+                Get Started
+              </Link>
+              <Link
+                to="/login"
+                className="px-6 py-2 border border-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition"
+              >
+                Login
+              </Link>
+            </div>
+          )}
         </section>
 
-        {/* 2. Product Section */}
+        {/* Product Section */}
         <ProductSection />
 
-        {/* 3. USP */}
+        {/* Unique Selling Points */}
         <section id="usp" className="text-center py-16">
           <h3 className="text-3xl font-bold mb-6">Why Choose Us? 🐝</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4 md:px-8">
@@ -129,7 +141,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* 4. How We Harvest */}
+        {/* Harvest Info */}
         <section id="harvest" className="text-center py-16">
           <h3 className="text-3xl font-bold mb-4">How We Harvest Honey 🍯</h3>
           <p className="max-w-3xl mx-auto leading-relaxed">
@@ -139,7 +151,7 @@ export default function LandingPage() {
           </p>
         </section>
 
-        {/* 5. About */}
+        {/* About */}
         <section id="about" className="text-center py-16">
           <h3 className="text-3xl font-bold mb-4">About BTech Honey</h3>
           <p className="max-w-3xl mx-auto leading-relaxed">
@@ -148,7 +160,7 @@ export default function LandingPage() {
           </p>
         </section>
 
-        {/* 6. Testimonials */}
+        {/* Testimonials */}
         <section id="testimonials" className="text-center py-16">
           <h3 className="text-3xl font-bold mb-6">What Our Customers Say</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 md:px-8">
@@ -166,17 +178,14 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* 7. Contact */}
+        {/* Contact */}
         <section id="contact" className="text-center py-16">
           <h3 className="text-3xl font-bold mb-4">Contact Us</h3>
           <p className="max-w-3xl mx-auto leading-relaxed">
             Have questions, suggestions, or just want to say hi?
             <br />
             📧 Email:{" "}
-            <a
-              href="mailto:support@btechhoney.com"
-              className="underline"
-            >
+            <a href="mailto:support@btechhoney.com" className="underline">
               support@btechhoney.com
             </a>
             <br />
@@ -184,16 +193,12 @@ export default function LandingPage() {
           </p>
         </section>
 
-        {/* 8. Footer */}
+        {/* Footer */}
         <footer className="text-yellow-100 py-6 text-center bg-black/70">
           <p>© 2025 BTech Wala. Made with Passion for All.</p>
           <div className="mt-2 space-x-4">
-            <a href="#about" className="hover:underline">
-              About
-            </a>
-            <a href="#contact" className="hover:underline">
-              Contact
-            </a>
+            <a href="#about" className="hover:underline">About</a>
+            <a href="#contact" className="hover:underline">Contact</a>
           </div>
         </footer>
       </div>

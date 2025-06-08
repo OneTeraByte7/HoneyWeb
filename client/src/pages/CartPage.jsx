@@ -1,13 +1,16 @@
 import { useCart } from "./CartContext";
-import { Link } from "react-router-dom";
-import Squares from "./Squares"; // import your Squares background component
+import { Link, useNavigate } from "react-router-dom";
+import Squares from "./Squares"; // Background component
 
 export default function CartPage() {
   const { cart, removeFromCart } = useCart();
+  const navigate = useNavigate();
+
+  const totalAmount = cart.reduce((sum, item) => sum + item.rate * item.quantity, 0);
 
   return (
     <section className="relative min-h-screen px-8 py-20 bg-black text-white overflow-hidden">
-      {/* Squares background - absolute, full size, behind content */}
+      {/* Background squares */}
       <Squares className="absolute inset-0 -z-10" />
 
       <h2 className="text-3xl font-bold text-center mb-10 text-yellow-400">Your Cart</h2>
@@ -20,7 +23,10 @@ export default function CartPage() {
       ) : (
         <div className="max-w-4xl mx-auto space-y-6">
           {cart.map((item) => (
-            <div key={item.id} className="flex items-center justify-between bg-white/10 p-4 rounded-lg border border-yellow-700">
+            <div
+              key={item.id}
+              className="flex items-center justify-between bg-white/10 p-4 rounded-lg border border-yellow-700"
+            >
               <div className="flex items-center gap-4">
                 <img src={item.img} alt={item.name} className="h-20 w-20 object-cover rounded" />
                 <div>
@@ -42,10 +48,11 @@ export default function CartPage() {
           ))}
 
           <div className="text-right mt-6">
-            <p className="text-xl font-bold text-yellow-300">
-              Total: ₹{cart.reduce((sum, item) => sum + item.rate * item.quantity, 0)}
-            </p>
-            <button className="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded shadow-md">
+            <p className="text-xl font-bold text-yellow-300">Total: ₹{totalAmount}</p>
+            <button
+              onClick={() => navigate("/checkout")}
+              className="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded shadow-md"
+            >
               Proceed to Checkout
             </button>
           </div>
